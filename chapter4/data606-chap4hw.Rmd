@@ -1,0 +1,40 @@
+---
+title: "Data 606 - Chapter4HW"
+output:
+  html_document:
+    #css: ../css/lab.css
+    highlight: pygments
+    df_print: paged
+    theme: lumen
+    code_folding: "hide"
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question {.tabset .tabset-fade}
+
+## 4.4
+![](./hwpics/4.4.png)
+
+## 4.14
+![](./hwpics/4.14.png)
+
+## 4.24
+![](./hwpics/4.24.png)
+
+## 4.26
+![](./hwpics/4.26.png)
+
+## 4.34
+![](./hwpics/4.34.png)
+
+## 4.40
+![](./hwpics/4.40.png)
+
+
+## 4.48
+![](./hwpics/4.48.png)
