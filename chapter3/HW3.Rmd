@@ -1,0 +1,246 @@
+---
+title: "Data 606 - HW3"
+author: "Baron Curtin"
+date: "March 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(magrittr)
+library(DATA606)
+```
+
+
+
+## 3.2 I. What percent of a standard normal distribution N(µ =0,= 1) is found in each region? Be sure to draw a graph.
+
+```{r 3.2a}
+m <- 0
+sd <- 1
+z <- -1.13
+
+# find x
+x <- (z * sd * m) %>%
+  print
+
+# probability x > -1.13
+1 - pnorm(x, mean = 0, sd = 1)
+
+# probability plot
+normalPlot(mean = 0, sd = 1, bounds = c(x, 1e+06), tails = FALSE)
+```
+
+```{r 3.2b}
+m <- 0
+sd <- 1
+z <- 0.18
+
+# finding x
+x <- (z * sd * m) %>%
+  print
+
+# probability x < .18
+pnorm(x, mean = 0, sd = 1)
+
+# probability plot
+normalPlot(mean = 0, sd = 1, bounds = c(-1e+06, x), tails = FALSE)
+```
+
+```{r 3.2c}
+m <- 0
+sd <- 1
+z <- 8
+
+# finding x
+x <- (z * sd * m) %>%
+  print
+
+# probability x > 8
+1 - pnorm(x, mean = 0, sd = 1)
+
+# probability plot
+normalPlot(mean = 0, sd = 1, bounds = c(x, 1e+06), tails = FALSE)
+```
+
+```{r 3.2d}
+m <- 0
+sd <- 1
+z <- .5
+
+# finding x
+x <- (z * sd * m) %>%
+  print
+
+# probability |x| < .5
+x1 <- pnorm(-x, mean = 0, sd = 1)
+x2 <- pnorm(x, mean = 0, sd = 1)
+print(x2 - x1)
+
+# probability plot
+normalPlot(mean = 0, sd = 1, bounds = c(-x, x), tails = FALSE)
+```
+
+## 3.4
+  * a.) Group Men, Ages 30 - 34: N(4313, 583)
+        Group Women, Ages 25-29: N(5261, 807)
+  * b.)
+```{r 3.4b}
+# leo zscore
+ltime <- 4948
+lm <- 4313
+lsd <- 583
+
+zleo <- ((ltime - lm)/lsd) %>%
+  print
+
+# mary zscore
+mtime <- 5261
+mm <- 4313
+msd <- 807
+
+zmary <- ((mtime - mm)/msd) %>%
+  print
+```
+
+  * c.) Mary performed better in her group than Leo because she was in the top 12% of her group as opposed to Leo at 13.80% in his.
+```{r 3.4c}
+# leo rank
+leo <- 1 - pnorm(ltime, mean = lm, sd = lsd) %>%
+  print
+
+# mary rank
+mary <- 1 - pnorm(mtime, mean = mm, sd = msd) %>%
+  print
+```
+
+  * d.)
+```{r 3.4d}
+pnorm(ltime, mean = lm, sd = lsd) %>%
+  print
+```
+
+  * e.)
+```{r}
+pnorm(mtime, mean = mm, sd = msd) %>%
+  print
+```
+
+  * f.) The answer to B would not change because Z-scores can be calculated for non-normal distributions. Part E would be difficult to calculate do to it not being a normal distribution.
+
+## 3.18 The data does follow the 68-95-99.7 rule for the most part.
+```{r 3.18}
+heights <- c(54,55,56,56,57,58,58,59,60,60,60,61,61,62,62,63,63,63,64,65,65,67,67,69,73)
+m <- 61.52
+sd <- 4.58
+
+zScores <- (heights - m) / sd
+hist(zScores, col="white", freq=F, xlim=c(-5, 5))
+curve(dnorm, -3, 3, add=T, col="blue") # 99.7% Rule
+curve(dnorm,-2,2,add=T, col="red") # 95% Rule
+curve(dnorm,-1,1,add=T, col="orange") # 68% Rules
+```
+
+## 3.22
+  * a.) The probability is almost 0% that the 10th transitor will be produced with a defect.
+```{r 3.22a}
+# Rate of success and failure definition
+pf <- 0.02
+ps <- 1 - pf
+n <- 10
+
+# This is a geometric distribution
+round(dgeom(n, ps), 4)
+
+round(ps * (1 - ps)^(n - 1), 4) %>%
+  print
+```
+
+  * b.) There is a 13.26% chance the machines produces zero defective transitors.
+```{r 3.22b}
+# Rate of success and failure definition
+pf <- 0.02
+ps <- 1 - pf
+n <- 100
+
+# This is a geometric distribution
+round(ps^n, 4) %>%
+  print
+```
+
+  * c.) On average, there should be 50 transitors produced before the first defect, with a standard deviation of 49.50.
+```{r 3.22c}
+# Expected value of a geometric distribution
+pf <- 0.02
+Ex <- (1/pf) %>%
+  print
+
+# standard deviation
+sd <- (((1 - pf)/pf^2)^(1/2)) %>%
+  print
+```
+
+  * d.) On average, there should be 20 transitors before the first defect, with a standard deviation of 19.50.
+```{r 3.22d}
+# Expected value of a geometric distribution
+pf <- 0.05
+Ex <- (1/pf) %>%
+  print
+
+# standard deviation
+sd <- (((1 - pf)/pf^2)^(1/2)) %>%
+  print
+```
+
+  * e.) Increasing the probability of failure decreases the trials before a defect and therefore the waiting time before a failure (success) and standard deviation are smaller.
+
+## 3.38
+  * a.)
+```{r 3.38a}
+n <- 3
+k <- 2
+pboy <- 0.51
+pboy2 <- (choose(n, k) * (1 - pboy)^(n - k) * (pboy)^k) %>%
+  print
+```
+
+  * b.)
+```{r 3.38b}
+children <- data.frame(c("BBG", "BGB", "GBB"))
+children$p <- c(pboy * pboy * (1 - pboy), pboy * (1 - pboy) * pboy, (1 - pboy) * 
+    pboy * pboy)
+names(children) <- c("Kids", "p")
+
+sump <- sum(children$p) %>%
+  print
+
+(pboy2 - sump) %>%
+  print
+
+children %>%
+  print
+```
+
+  * c.) The second method will be more tedious because a combination of 56 different possibilities will have to be made. This would create a great deal of redundancy.
+
+## 3.42
+  * a.)
+```{r 3.42a}
+# Negative Binomial distribution
+p <- 0.15
+n <- 10
+k <- 3
+
+(choose(n - 1, k - 1) * (1 - p)^(n - k) * p^k) %>%
+  print
+```
+
+  * b.) The probability that her 10th serve will be successful is 15% since they are independent events.
+  * c.) The probability are different because part A was the calculation of a specific scenario with 3 successes in 10 attempts. The probability of B is calculated for only one attempt.
+
+
+

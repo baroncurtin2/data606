@@ -1,0 +1,182 @@
+---
+title: "Data 606 - Week3HW"
+author: "Baron Curtin"
+date: "February 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Environment Setup
+```{r env, echo=FALSE}
+library(tidyverse)
+library(magrittr)
+library(prob)
+library(ggplot2)
+library(VennDiagram)
+```
+
+## 2.6 Dice rolls. If you roll a pair of fair dice, what is the probability of
+  * (a) getting a sum of 1?
+```{r 2.6a}
+# get sample space of rolling die possibilites
+# add sum column
+ss <- rolldie(2) %>%
+  mutate(sum = X1 + X2)
+
+poss <- nrow(ss)
+
+sumof1 <- ss %>%
+  filter(sum == 1) %>%
+  count
+
+sumof1/poss %>%
+  print
+```
+  * (b) getting a sum of 5?
+```{r 2.6b}
+sumof5 <- ss %>%
+  filter(sum == 5) %>%
+  count
+
+sumof5/poss %>%
+  print
+```
+  
+  * (c) getting a sum of 12?
+```{r 2.6c}
+sumof12 <- ss %>%
+  filter(sum == 12) %>%
+  count
+
+sumof12/poss %>%
+  print
+```
+
+## 2.8  Poverty and language. The American Community Survey is an ongoing survey that
+provides data every year to give communities the current information they need to plan investments and services. The 2010 American Community Survey estimates that 14.6% of Americans live below the poverty line, 20.7% speak a language other than English (foreign language) at home, and 4.2% fall into both categories.
+```{r 2.8}
+pov <- .146
+lote <- .207
+both <- .042
+```
+
+  * (a) Are living below the poverty line and speaking a foreign language at home disjoint?
+  They are not disjoint since there are individuals who belong t both groups.
+  * (b) Draw a Venn diagram summarizing the variables and their associated probabilities.
+```{r 2.8b}
+grid.newpage()
+draw.pairwise.venn(area1 = .146, area2 = .207, cross.area = .042,
+                   category = c("Below Poverty", "LOTE"))
+```
+  * (c) What percent of Americans live below the poverty line and only speak English at home?
+```{r}
+pov - both
+```
+  * (d) What percent of Americans live below the poverty line or speak a foreign language at home?
+```{r}
+pov + lote - both
+```
+  * (e) What percent of Americans live above the poverty line and only speak English at home?
+```{r}
+1 - (pov + lote - both)
+```
+  * (f) Is the event that someone lives below the poverty line independent of the event that the person speaks a foreign language at home
+  Someone living below the poverty line does not indicate the language they speak at home because there are people that live below the poverty line yet speak English.
+  
+## 2.20 Assortative mating. Assortative mating is a nonrandom mating pattern where individuals with similar genotypes and/or phenotypes mate with one another more frequently than what would be expected under a random mating pattern. Researchers studying this topic collected data on eye colors of 204 Scandinavian men and their female partners. The table below summarizes the results. For simplicity, we only include heterosexual relationships in this exercise.
+  * (a) What is the probability that a randomly chosen male respondent or his partner has blue eyes?
+```{r 2.20a}
+(108 + 114 - 78)/204
+```
+  * (b) What is the probability that a randomly chosen male respondent with blue eyes has a partner with blue eyes?
+```{r 2.20b}
+78/204
+```
+  * (c) What is the probability that a randomly chosen male respondent with brown eyes has a partner with blue eyes? What about the probability of a randomly chosen male respondent with green eyes having a partner with blue eyes?
+```{r 2.20c}
+BrBl <- (19/204) %>%
+  print
+
+GrBl <- (13/204) %>%
+  print
+```
+  * (d) Does it appear that the eye colors of male respondents and their partners are independent? Explain your reasoning.
+  It does appear that there is a correlation between matching partner eye colors however I still believe that these are independent events. The relationship does not explain causality and as such there is no dependency. A significance test would need to be performed to determine causality.
+  
+## 2.30 Books on a bookshelf. The table below shows the distribution of books on a bookcase based on whether they are nonfiction or fiction and hardcover or paperback.
+```{r 2.30}
+books <- matrix(c(13,  59, 15, 8), nrow = 2, ncol = 2, byrow = TRUE)
+```
+  * (a) Find the probability of drawing a hardcover book first then a paperback fiction book second when drawing without replacement.
+```{r 2.30a}
+sum(books[,1])/sum(books) * books[1,2]/(sum(books) -1)
+```
+  * (b) Determine the probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement.
+```{r 2.30b}
+sum(books[1,])/sum(books) * sum(books[,1])/(sum(books) - 1)
+```
+  * (c) Calculate the probability of the scenario in part (b), except this time complete the calculations under the scenario where the first book is placed back on the bookcase before randomly drawing the second book.
+```{r 2.30c}
+sum(books[1,])/sum(books) * sum(books[,1])/(sum(books))
+```
+  * (d) The final answers to parts (b) and (c) are very similar. Explain why this is the case.
+  The probabilities are similar because the denominator is only changing very slightly. In the case of replacement, adding that extra book back the pool of books lowers the probability of achieving the condition by a very slight amount.
+  
+## 2.38 Baggage fees. An airline charges the following baggage fees: $25 for the first bag and $35 for the second. Suppose 54% of passengers have no checked luggage, 34% have one piece of checked luggage and 12% have two pieces. We suppose a negligible portion of people check more than two bag.
+```{r 2.38}
+bags <- c(0,1,2)
+fees <- c(0,25,25+35)
+prob <- c(.52, .34, .12)
+model <- data_frame(bags, fees, prob)
+```
+  * (a) Build a probability model, compute the average revenue per passenger, and compute the corresponding standard deviation.
+```{r 2.38a}
+avgrev <- sum(fees * prob) %>%
+  print
+
+sd <- (((fees - avgrev)^2) * prob) %>%
+  sum %>%
+  sqrt %>%
+  print
+```
+  * (b) About how much revenue should the airline expect for a flight of 120 passengers? With what standard deviation? Note any assumptions you make and if you think they are justified.
+```{r 2.38b}
+rev120 <- (avgrev * 120) %>%
+  print
+
+sd120 <- (sd^2 * 120) %>%
+  sqrt %>%
+  print
+```
+  
+## 2.44 Income and gender. The relative frequency table below displays the distribution of annual total personal income (in 2009 inflation-adjusted dollars) for a representative sample of 96,420,486 Americans. These data come from the American Community Survey for 2005-2009. This sample is comprised of 59% males and 41% females.
+```{r 2.44}
+inc <- c("1 to 9,999", "10,000 to 14,999", "15,000 to 24,999", "25,000 to 34,999",
+         "35,000 to 49,999", "50,000 to 64,999", "65,000 to 74,999",
+         "75,000 to 99,999", "100,000 or more")
+total <- c(.022, .047, .158, .183, .212, .139, .058, .084, .097)
+dis <- data_frame(inc, total)
+
+male <- .59
+female <- .41
+```
+  * (a) Describe the distribution of total personal income.
+```{r 2.44a}
+barplot(dis$total, names.arg = inc, xlab = "Income", ylab = "Total")
+```
+  The distribution is unimodal, skewed left, and asymmetrical.
+  * (b) What is the probability that a randomly chosen US resident makes less than $50,000 per year?
+```{r 2.44b}
+lt50k <- sum(dis$total[1:5]) %>%
+  print
+```
+  * (c) What is the probability that a randomly chosen US resident makes less than $50,000 per year and is female? Note any assumptions you make.
+```{r 2.44c}
+flt50k <- (lt50k * female) %>%
+  print
+```
+  * (d) The same data source indicates that 71.8% of females make less than $50,000 per year. Use this value to determine whether or not the assumption you made in part (c) is valid.
+  The assumption made in part c is that the percentage of men and women is equally distributed amongst the different income brackets. If 71.8% of females make less then $50K per year, then that means most of the female population within this distribution are within the lower income brackets. This makes the equality assumption false.
