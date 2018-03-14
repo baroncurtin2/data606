@@ -7,34 +7,214 @@ output:
     df_print: paged
     theme: lumen
     code_folding: "hide"
-    toc: true
-    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Question {.tabset .tabset-fade}
+```{r env, include=FALSE}
+library(tidyverse)
+library(magrittr)
+library(kableExtra)
+```
+
+
+# Questions {.tabset .tabset-fade .tabset-pills}
 
 ## 4.4
 ![](./hwpics/4.4.png)
 
+### a.)
+The point estimate for the average height of active individuals is 171.1. The point estimate for the median is 170.3.
+
+### b.)
+The point estimate for the standard deviation is 9.4. The IQR is `r 177.8-163.8`
+
+### c.)
+```{r 4.4c}
+# mean/sd/ss
+ss <- 507
+m <- 171.4
+sd <- 9.4
+
+# 180cm unusually tall
+x1 <- 180
+z1 <- (x1 - m)/sd
+
+# 155 unusually short
+x2 <- 155
+z2 <- (x2 - m)/sd
+
+# create dataframe to display results
+data_frame(x_values = c(x1, x2), z_scores = c(z1, z2), unusual = abs(c(z1, z2)) > 2)
+```
+
+### d.)
+I would not expect the mean and standard deviation of the new sample to be exactly the same as the above because of sampling error. They should be similar however because sample means/standard deviations should approximate the mean and population of the population. Depending on the sample, outliers or values could be centered around a certain value should cause the mean/standard deviation to be different.
+
+
+### e.)
+```{r 4.4e}
+se <- (sd/sqrt(ss)) %>%
+  print
+```
+
+
+
 ## 4.14
 ![](./hwpics/4.14.png)
+
+### a.)
+False. The statistics about the 436 Americans are observations of that sample. There is no uncertainty.
+
+### b.)
+False. Distribution skew has no bearing on the confidence interval since the sample size is >= 30.
+
+### c.)
+False. The confidence interval makes no inference about the sample means.
+
+### d.)
+True. The confidence interval is making an inference about the population of the sample.
+
+### e.)
+True. The smaller the multiplier, the narrower the range.
+
+### f.)
+False. In order to descrease the margin of error to a third, the sample would need to increase by 9.
+
+### g.)
+```{r 4.14g}
+ut <- 89.11
+lt <- 80.31
+me <- ((ut - lt)/2) %>%
+  equals('4.4') %>%
+  print
+```
 
 ## 4.24
 ![](./hwpics/4.24.png)
 
+### a.)
+The conditions for inference are satisfied. The sample is a simple random sample of greater than size 30. The distribution is not strongly skewed.
+
+### b.)
+```{r 4.24b}
+h0 <- "m = 32"
+hA <- "m < 32"
+
+# calc zscore
+x <- 32
+n <- 36
+m <- 30.69
+sd <- 4.31
+se <- sd/sqrt(n)
+z <- (m - x)/se
+
+p <- pnorm(z, mean = 0, sd = 1) %>%
+  print
+```
+
+### c.)
+The p-value is less than the .1 sigificance level. This would mean that we reject the null and that it is plausible that gifted children do count to 10 before 32 months.
+
+### d.)
+```{r 4.24d}
+lt <- m - 1.645 * se
+ut <- m + 1.645 * se
+
+ci <- c(lt, ut) %>%
+  print
+```
+
+### e.)
+Yes, based on a 90% confidence interval, we can infer that gifted children will typically count to 10 between the ages of 29.50834 months and 31.87166 months.
+
 ## 4.26
 ![](./hwpics/4.26.png)
+
+### a.)
+```{r 4.26a}
+x <- 100
+n <- 36
+m <- 118.2
+sd <- 6.5
+se <- sd/sqrt(n)
+z <- (m - x)/se
+p <- (pnorm(z, mean = 0, sd = 1, lower.tail = FALSE) * 2) %>%
+  print
+```
+
+### b.)
+```{r 4.26b}
+# lower/upper tail
+lt <- m - 1.645 * se
+ut <- m + 1.645 * se
+
+# confidence interval
+ci <- c(lt, ut) %>%
+  print
+```
+
+### c.)
+From the confidence interval, we can see that the lowest expectation of a mother's IQ of a gifted child, at a 90% confidence interval is 116. This is far larger and different than the 100 mean of the population.
+
 
 ## 4.34
 ![](./hwpics/4.34.png)
 
+The term sampling distribution is typical used to describe the shape and distribution of the means of multiple samples from a population, of the same size. As the sample size increases, the shape becomes more normal, the center moves closer to the population mean, and the spread becomes narrower.
+
+
 ## 4.40
 ![](./hwpics/4.40.png)
+
+### a.)
+```{r 4.40a}
+m <- 9000
+sd <- 1000
+
+x <- 10500
+p <- (1 - pnorm(x, mean = m, sd = sd)) %>%
+  print
+```
+
+### b.)
+Since the population distribution is nearly normal, the sample distribution should also be approximately normal. The sample error is `r sd/sqrt(15)`
+
+### c.)
+```{r 4.40c}
+n <- 15
+x <- 10500
+
+se <- sd/sqrt(n)
+p <- (1 - pnorm(x, mean = m, sd = se)) %>%
+  print
+
+```
+
+### d.)
+```{r 4.40d}
+# population
+pop_seq <- seq(m - (4 * sd), m + (4 * sd), length=15)
+pop_dis <- dnorm(pop_seq, m, sd)
+
+# sample
+sam_seq <- seq(m - (4 * se), m + (4 * se), length=15)
+sam_dis <- dnorm(sam_seq, m, se)
+
+# plot
+data <- data_frame(pop_seq, pop_dis, sam_seq, sam_dis)
+ggplot(data = data, aes(pop_seq, pop_dis, color = "red")) +
+  geom_line() +
+  geom_line(data = data, aes(sam_seq, sam_dis, color = "blue"))
+```
+
+### e.)
+With a skewed distribution and a sample size less than 30, we no longer meet the criteria for inference.
 
 
 ## 4.48
 ![](./hwpics/4.48.png)
+
+Increasing the sample size, decreases the standard error. Decreasing the standard error, decreases the Z value. Decreasing the Z value, will decrease the P-value.
