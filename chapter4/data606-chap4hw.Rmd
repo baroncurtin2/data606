@@ -2,7 +2,7 @@
 title: "Data 606 - Chapter4HW"
 output:
   html_document:
-    #css: ../css/lab.css
+    css: ../css/lab.css
     highlight: pygments
     df_print: paged
     theme: lumen
@@ -23,7 +23,7 @@ library(kableExtra)
 # Questions {.tabset .tabset-fade .tabset-pills}
 
 ## 4.4
-![](./hwpics/4.4.png)
+1. ![](./hwpics/4.4.png)
 
 ### a.)
 The point estimate for the average height of active individuals is 171.1. The point estimate for the median is 170.3.
@@ -63,7 +63,7 @@ se <- (sd/sqrt(ss)) %>%
 
 
 ## 4.14
-![](./hwpics/4.14.png)
+2. ![](./hwpics/4.14.png)
 
 ### a.)
 False. The statistics about the 436 Americans are observations of that sample. There is no uncertainty.
@@ -93,7 +93,7 @@ me <- ((ut - lt)/2) %>%
 ```
 
 ## 4.24
-![](./hwpics/4.24.png)
+3. ![](./hwpics/4.24.png)
 
 ### a.)
 The conditions for inference are satisfied. The sample is a simple random sample of greater than size 30. The distribution is not strongly skewed.
@@ -131,7 +131,7 @@ ci <- c(lt, ut) %>%
 Yes, based on a 90% confidence interval, we can infer that gifted children will typically count to 10 between the ages of 29.50834 months and 31.87166 months.
 
 ## 4.26
-![](./hwpics/4.26.png)
+4. ![](./hwpics/4.26.png)
 
 ### a.)
 ```{r 4.26a}
@@ -161,13 +161,13 @@ From the confidence interval, we can see that the lowest expectation of a mother
 
 
 ## 4.34
-![](./hwpics/4.34.png)
+5. ![](./hwpics/4.34.png)
 
 The term sampling distribution is typical used to describe the shape and distribution of the means of multiple samples from a population, of the same size. As the sample size increases, the shape becomes more normal, the center moves closer to the population mean, and the spread becomes narrower.
 
 
 ## 4.40
-![](./hwpics/4.40.png)
+6. ![](./hwpics/4.40.png)
 
 ### a.)
 ```{r 4.40a}
@@ -215,6 +215,6 @@ With a skewed distribution and a sample size less than 30, we no longer meet the
 
 
 ## 4.48
-![](./hwpics/4.48.png)
+7. ![](./hwpics/4.48.png)
 
 Increasing the sample size, decreases the standard error. Decreasing the standard error, decreases the Z value. Decreasing the Z value, will decrease the P-value.
