@@ -22,6 +22,9 @@ Load the `nc` data set into our workspace.
 
 ```{r load-data, eval=TRUE}
 load("more/nc.RData")
+
+libs <- c("tidyverse", "magrittr")
+lapply(libs, require, character.only=TRUE)
 ```
 
 We have observations on 13 different variables, some categorical and some 
@@ -44,6 +47,10 @@ variable         | description
 `whitemom`       | whether mom is `white` or `not white`.
 
 1.  What are the cases in this data set? How many cases are there in our sample?
+```{r 1}
+nrow(nc)
+```
+
 
 As a first step in the analysis, we should consider summaries of the data. This
 can be done using the `summary` command:
@@ -63,6 +70,12 @@ questions.
 
 2.  Make a side-by-side boxplot of `habit` and `weight`. What does the plot 
 highlight about the relationship between these two variables?
+```{r 2}
+ggplot(nc, aes(x = habit, y = weight)) +
+  geom_boxplot()
+```
+  * The relationship seems to indicate that there are more heavy non-smokers than there are heavy smokers, however the habit does not seem to have a causational relationship on weight.
+
 
 The box plots show how the medians of the two distributions compare, but we can
 also compare the means of the distributions using the following function to 
@@ -83,9 +96,15 @@ significant? In order to answer this question we will conduct a hypothesis test
 you will need to obtain sample sizes to check the conditions. You can compute 
 the group size using the same `by` command above but replacing `mean` with 
 `length`.
+```{r 3}
+by(nc$weight, nc$habit, length)
+```
+
 
 4.  Write the hypotheses for testing if the average weights of babies born to 
 smoking and non-smoking mothers are different.
+  * H0: Average weights of babies born to smoking and non-smoking mothers are not different
+  * HA: Average weights of babies born to smoking and non-smoking mothers are different
 
 Next, we introduce a new function, `inference`, that we will use for conducting
 hypothesis tests and constructing confidence intervals. 
@@ -111,6 +130,11 @@ of inference can be `"theoretical"` or `"simulation"` based.
 5.  Change the `type` argument to `"ci"` to construct and record a confidence 
 interval for the difference between the weights of babies born to smoking and 
 non-smoking mothers.
+```{r 5}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
 
 By default the function reports an interval for ($\mu_{nonsmoker} - \mu_{smoker}$)
 . We can easily change this order by using the `order` argument:
@@ -129,16 +153,40 @@ inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0,
 (`weeks`) and interpret it in context. Note that since you're doing inference 
 on a single population parameter, there is no explanatory variable, so you can 
 omit the `x` variable from the function.
+```{r 5a}
+inference(y = nc$weeks, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical")
+```
+
 
 -   Calculate a new confidence interval for the same parameter at the 90% 
 confidence level. You can change the confidence level by adding a new argument 
 to the function: `conflevel = 0.90`.
+```{r 5b}
+inference(y = nc$weeks, est = "mean", type = "ci", null = 0, 
+          alternative = "twosided", method = "theoretical", conflevel = .9)
+```
+
 
 -   Conduct a hypothesis test evaluating whether the average weight gained by 
 younger mothers is different than the average weight gained by mature mothers.
+```{r 5c}
+inference(y = nc$gained, x = nc$mature, est = "mean", type = "ht", null = 0, 
+          alternative = "less", method = "theoretical")
+```
+
 
 -   Now, a non-inference task: Determine the age cutoff for younger and mature 
 mothers. Use a method of your choice, and explain how your method works.
+```{r 5d}
+by(nc$mage, nc$mature, summary)
+ggplot(nc, aes(x = mature, y = mage, fill = mature)) +
+  geom_boxplot()
+```
+  * Younger Moms: 13-34
+  * Mature Moms: 35-50
+  * The method uses the summary function to get the range of values for the mother's age categorized by mature or young.
+
 
 -   Pick a pair of numerical and categorical variables and come up with a 
 research question evaluating the relationship between these variables. 
@@ -146,6 +194,13 @@ Formulate the question in a way that it can be answered using a hypothesis test
 and/or a confidence interval. Answer your question using the `inference` 
 function, report the statistical results, and also provide an explanation in 
 plain language.
+  * H0: The ratio of mature mothers who are married is not different than the ones who are younger
+  * HA: The ratio of mature mothers who are married is greater than the ones who are younger
+```{r 5e}
+inference(y = nc$marital, x = nc$mature, est = "proportion", type = "ht", null = 0, 
+          alternative = "greater", method = "theoretical", success = "married")
+```
+
 
 <div id="license">
 This is a product of OpenIntro that is released under a [Creative Commons 
