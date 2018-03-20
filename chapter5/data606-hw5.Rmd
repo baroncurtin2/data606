@@ -157,15 +157,15 @@ dfr <- n - k
 prf <- .0682
 f_stat <- qf(1 - prf, df, dfr)
 
-# msg
+# msd
 msd <- 501.54
-msr <- msg / f_stat
+msr <- msd / f_stat
 
-ssd <- df * msg
+ssd <- df * msd
 ssr <- 267382
 
-# sst = ssg + sse
-sst <- ssg + sse
+# sst = ssd + ssr
+sst <- ssd + ssr
 dft <- df + dfr
 
 final_df <- data_frame(df = c(df, dfr, dft), sum_sq = c(ssd, ssr, sst), mean_sq = c(msd, msr, NA), f_val = c(f_stat, NA, NA), prf = c(prf, NA, NA))
