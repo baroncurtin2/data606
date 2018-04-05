@@ -1,0 +1,95 @@
+---
+title: "Data 606 - Project Proposal"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+
+libs <- c("tidyverse", "magrittr", "jsonlite", "httr", "knitr", "kableExtra", "formatR", "RCurl")
+lapply(libs, require, character.only = TRUE)
+```
+
+### Data Preparation
+
+```{r data, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+data <- getURL("https://raw.githubusercontent.com/fivethirtyeight/data/master/hate-crimes/hate_crimes.csv") %>%
+  read_csv()
+```
+
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**  
+
+Are there more annual hate crimes per 100,000 population in areas where the greater share of the population voted for Trump in 2016?
+
+
+### Cases 
+
+**What are the cases, and how many are there?**  
+
+There are 51 cases, all 50 US states and the District of Columbia. Each case has relevant statistics on hate crimes and vote results from the 2016 election.
+
+
+### Data collection 
+
+**Describe the method of data collection.**  
+
+The data collection was simple. The data source was posted on FiveThirtyEight's GitHub in a CSV format. That data was gathered from numerous sources including the Kaiser Family Foundeation, Census Bureau, United States Election Project, Souther Poverty Law Center, and the FBI.
+
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**  
+
+This is an observational study as there it is just analyzing data on event that have occured.
+
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**  
+
+
+[Data](https://github.com/fivethirtyeight/data/blob/master/hate-crimes/hate_crimes.csv)
+<https://github.com/fivethirtyeight/data/blob/master/hate-crimes/hate_crimes.csv>
+
+
+
+### Response 
+**What is the response variable, and what type is it (numerical/categorical)?**  
+
+The response variable is average annual hate crimes per 100,000 population and it is a numerical variable.
+
+
+### Explanatory 
+**What is the explanatory variable, and what type is it (numerical/categorival)?**  
+
+The explanatory variable is the share of the population in the state that voted for Trump in 2016. This is also a numerical variable.
+
+
+
+### Relevant summary statistics 
+
+**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**  
+
+```{r}
+summary(data)
+
+one <- data %>%
+  select(state, median_household_income, share_voters_voted_trump) %>%
+  arrange(desc(median_household_income)) %>%
+  head(5)
+
+# top 5 median incomes
+kable(one, "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
