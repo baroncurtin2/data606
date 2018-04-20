@@ -13,17 +13,25 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(tidy = TRUE)
 knitr::opts_chunk$set(warning = FALSE)
 
-libs <- c("tidyverse", "magrittr", "jsonlite", "httr", "knitr", "kableExtra", "formatR", "RCurl")
+libs <- c("tidyverse", "magrittr", "knitr", "kableExtra", "formatR", "RCurl")
 lapply(libs, require, character.only = TRUE)
 ```
 
 ### Data Preparation
 
-```{r data, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
-# load data
-data <- getURL("https://raw.githubusercontent.com/fivethirtyeight/data/master/hate-crimes/hate_crimes.csv") %>%
-  read_csv()
+```{r data-prep}
+data <- read_csv("https://raw.githubusercontent.com/baroncurtin2/data606/master/project/data/hate_crimes.csv")
+region_mapping <- read_csv("https://raw.githubusercontent.com/baroncurtin2/data606/master/project/data/region_mapping.csv") %>%
+  # convert all headers to lowercase
+  rename_all(funs(str_to_lower(.)))
 ```
+
+#### Adding Qualitative Variables
+```{r}
+data %<>%
+  left_join(region_mapping, by = "state")
+```
+
 
 
 ### Research question 
@@ -51,7 +59,7 @@ The data collection was simple. The data source was posted on FiveThirtyEight's 
 
 **What type of study is this (observational/experiment)?**  
 
-This is an observational study as there it is just analyzing data on event that have occured.
+This is an observational study as there it is just analyzing data on events that have occured.
 
 
 ### Data Source 
@@ -59,8 +67,8 @@ This is an observational study as there it is just analyzing data on event that 
 **If you collected the data, state self-collected. If not, provide a citation/link.**  
 
 
-[Data](https://github.com/fivethirtyeight/data/blob/master/hate-crimes/hate_crimes.csv)
-<https://github.com/fivethirtyeight/data/blob/master/hate-crimes/hate_crimes.csv>
+[Data](https://github.com/fivethirtyeight/data/blob/master/hate-crimes/hate_crimes.csv)  
+[Region Mapping](https://raw.githubusercontent.com/cphalpert/census-regions/master/us%20census%20bureau%20regions%20and%20divisions.csv)  
 
 
 
@@ -93,3 +101,52 @@ one <- data %>%
 kable(one, "html") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
+
+
+#### Visualizations
+```{r}
+ggplot(data, aes(x = share_voters_voted_trump, y = avg_hatecrimes_per_100k_fbi, col = region)) +
+  geom_point(aes(size = avg_hatecrimes_per_100k_fbi), alpha = .6, shape = 16) +
+  geom_abline()
+```
+
+#### Linear Model
+```{r}
+model <- lm(avg_hatecrimes_per_100k_fbi ~ share_voters_voted_trump, data = data)
+summary(model)
+```
+
+#### Multiplot
+```{r}
+p1 <- data %>%
+  filter(region == "Northeast") %>%
+  ggplot(aes(x = share_voters_voted_trump, y = avg_hatecrimes_per_100k_fbi)) +
+  geom_point(aes(size = avg_hatecrimes_per_100k_fbi), alpha = .6, shape = 16) +
+  geom_abline()
+
+p2 <- data %>%
+  filter(region == "South") %>%
+  ggplot(aes(x = share_voters_voted_trump, y = avg_hatecrimes_per_100k_fbi)) +
+  geom_point(aes(size = avg_hatecrimes_per_100k_fbi), alpha = .6, shape = 16) +
+  geom_abline()
+
+p3 <- data %>%
+  filter(region == "Midwest") %>%
+  ggplot(aes(x = share_voters_voted_trump, y = avg_hatecrimes_per_100k_fbi)) +
+  geom_point(aes(size = avg_hatecrimes_per_100k_fbi), alpha = .6, shape = 16) +
+  geom_abline()
+
+p4 <- data %>%
+  filter(region == "West") %>%
+  ggplot(aes(x = share_voters_voted_trump, y = avg_hatecrimes_per_100k_fbi)) +
+  geom_point(aes(size = avg_hatecrimes_per_100k_fbi), alpha = .6, shape = 16) +
+  geom_abline()
+
+p1
+p2
+p3
+p4
+```
+
+There does appear to be fairly weak positive relationship across all of the regions.
+
