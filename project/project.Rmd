@@ -1,0 +1,64 @@
+---
+title: "Data 606 - Project"
+author: "Baron Curtin"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(collapse = TRUE)
+pkgs <- c("tidyverse", "magrittr", "kableExtra", "knitr")
+lapply(pkgs, require, character.only=TRUE)
+```
+
+### Part 1 - Introduction
+
+There is growing sentiment within society that instances of hate are increasing. In the 10 days following the 2016 election, nearly 900 hate incidents were reported to the Southern Poverty Law Center (Majumder 2017). Thats an average of 90 hate crimes per day. For contrast, 36,000 hate crimes were reported to the FBI from 2010-2015, or 16 hate crimes per day on average.
+
+The data we will be using for the analysis is a compilation of data from the Kaiser Family Foundation, the US Census Bureau, the US Election Project, Southern Poverty Law Center, and the FBI. The data is posted on FiveThirtyEight's GitHub in a CSV format. There are some caveats associated with the data: 1) the federal government doesn't track hate crimes systematically and thus some of the data is reliant upon media accounts and people's self-reports, 2) the FBI collects hate crime data from law enforcement agencies but the data is submitted voluntarily, 3) the FBI uses the Uniform Crime Reporting Program (UCR) to collect crime data, but the UCR only collects data on *prosecutable* hate crimes, 4) heightened news coverage of hate incidents after the election may have caused people to report hate incidents more frequently due to awareness bias (Majumder 2017). All of these things contribute to bias baked in to the data being used for analysis.
+
+The question we will be looking at in this analysis is:  
+
+> Are there more annual hate crimes per 100,00 population in areas where the greater share of population voted for Trump in 2016?
+
+
+### Part 2 - Data
+
+```{r dataload, results='hide', message=FALSE}
+hateCrimes <- read_csv("https://raw.githubusercontent.com/baroncurtin2/data606/master/project/data/hate_crimes.csv")
+regionMap <- read_csv("https://raw.githubusercontent.com/baroncurtin2/data606/master/project/data/region_mapping.csv") %>%
+  rename_all(funs(str_to_lower(.)))
+```
+
+Some manipulations will need to be done to the data. *hateCrimes* will be joined to *regionMap* to add the columns: Region, Division, and State.Code. The following code will join the two datasets and create an additional categorical variable to denote Trump support
+
+```{r}
+data <- hateCrimes %>%
+  # join two datasets
+  left_join(regionMap, by = "state") %>%
+  # add trump_support variables
+  mutate(support = if_else(share_voters_voted_trump > .5, 'Trump', if_else(share_voters_voted_trump < .5, 'Other', 'Split'), 'Split'))
+```
+
+
+### Part 3 - Exploratory Data Analysis
+
+
+### Part 4 - Inference
+
+
+### Part 5 - Conclusion
+
+
+### References
+Majumder, Maimuna. “Higher Rates Of Hate Crimes Are Tied To Income Inequality.” FiveThirtyEight, FiveThirtyEight, 21 Apr. 2017, fivethirtyeight.com/features/higher-rates-of-hate-crimes-are-tied-to-income-inequality/.
+
+### Appendix (optional)
+
+Remove this section if you don't have an appendix
