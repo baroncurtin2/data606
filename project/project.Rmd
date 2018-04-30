@@ -7,6 +7,7 @@ output:
     theme: cayman
     highlight: github
     df_print: paged
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -43,11 +44,57 @@ data <- hateCrimes %>%
   # join two datasets
   left_join(regionMap, by = "state") %>%
   # add trump_support variables
-  mutate(support = if_else(share_voters_voted_trump > .5, 'Trump', if_else(share_voters_voted_trump < .5, 'Other', 'Split'), 'Split'))
+  mutate(support = case_when(
+    share_voters_voted_trump > .5 ~ 'Trump',
+    share_voters_voted_trump < .5 ~ 'Clinton',
+    TRUE ~ 'Split'
+  ))
+```
+
+The decision here was made to create a column titled *support*. The condition was based on the percentage share of voters. A share of voters greater than 50% received a value of 'Trump', less than 50% received 'Clinton', and 50% received 'Split'.
+
+We can further trim some of the "fat" in the dataset to only keep the columns we are analyzing. We will keep the median household income as a comparison for 'Trump Support'. The original FiveThirtyEight article quoted income being the greatest predictor of hate crimes. We can also rename some columns for easier reference later
+```{r}
+data %<>%
+  select(-(3:9)) %>%
+  # rename column
+  rename(median_income = median_household_income,
+         trump_share = share_voters_voted_trump,
+         hate_crime_proportion = hate_crimes_per_100k_splc,
+         avg_hatecrimes = avg_hatecrimes_per_100k_fbi)
 ```
 
 
 ### Part 3 - Exploratory Data Analysis
+
+Lets get some general information on the dataset
+```{r}
+str(data)
+```
+We are able to see that there are 51 observations, and only 9 variables in the trimmed data set. We may want to convert some of the columns to factors in later analysis.
+
+
+#### Distribution
+
+```{r}
+plotSetup <- ggplot(data)
+
+plotSetup +
+  geom_bar(mapping = aes(x = support, 
+                         color = support, 
+                         fill = support))
+```
+Nationwide, there Trump appears to be the less popular option
+
+We are get more granular by looking at the distribution by region
+```{r}
+plotSetup +
+  geom_bar(mapping = aes(x = support, 
+                         color = support, 
+                         fill = support)) +
+  facet_grid(. ~ region)
+```
+By getting more granular, we are able to determine that Trump is more favored in the Midwest and the South. In the Northeast, Trump did not get any majority support in any of the states, and while the West did have some states where he had the majority, Clinton was overall the most favored
 
 
 ### Part 4 - Inference
