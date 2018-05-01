@@ -67,14 +67,18 @@ data %<>%
 
 ### Part 3 - Exploratory Data Analysis
 
+#### General Information
 Lets get some general information on the dataset
 ```{r}
 str(data)
 ```
 We are able to see that there are 51 observations, and only 9 variables in the trimmed data set. We may want to convert some of the columns to factors in later analysis.
 
+```{r}
+summary(data)
+```
 
-#### Distribution
+#### Histograms
 
 ```{r}
 plotSetup <- ggplot(data)
@@ -82,19 +86,90 @@ plotSetup <- ggplot(data)
 plotSetup +
   geom_bar(mapping = aes(x = support, 
                          color = support, 
-                         fill = support))
+                         fill = support)) +
+  labs(title = "Voter Support", x = "", y = "Frequency")
 ```
-Nationwide, there Trump appears to be the less popular option
+Nationwide, Trump appears to be the less popular option. This coincides with the results of the election. Clinton won the popular vote but lost the electoral college.
 
-We are get more granular by looking at the distribution by region
+We can get more granular by looking at the distribution by region
 ```{r}
 plotSetup +
   geom_bar(mapping = aes(x = support, 
                          color = support, 
                          fill = support)) +
-  facet_grid(. ~ region)
+  facet_grid(. ~ region) +
+  labs(x = "Voter Support", y = "Frequency", title = "Regional Voter Support")
 ```
 By getting more granular, we are able to determine that Trump is more favored in the Midwest and the South. In the Northeast, Trump did not get any majority support in any of the states, and while the West did have some states where he had the majority, Clinton was overall the most favored
+
+Lets take a look at the distribution of the avg_hatecrimes
+```{r}
+plotSetup +
+  geom_histogram(mapping = aes(x = avg_hatecrimes), binwidth = 1, na.rm = TRUE, alpha = .8, fill = "#377EB8") +
+  labs(x = "Average Hate Crimes", y = "Frequency", title = "Frequency Distribution")
+
+```
+The distribution shows a unimodal, skewed right distribution. If we remove the outlier...
+```{r}
+plotSetup +
+  geom_histogram(mapping = aes(x = avg_hatecrimes), binwidth = 1, na.rm = TRUE, alpha = .8, fill = "#377EB8") +
+  labs(x = "Average Hate Crimes", y = "Frequency", title = "Frequency Distribution") + 
+  xlim(0, 6)
+```
+...the distribution is still slightly skewed right and still unimodal.
+
+The main question being asked in this analysis is whether regions with voter support favoring Trump experienced instances of higher hate crime rates. To do some exploratory analysis, we can use a series of box plots and scatterplots to ascertain that relationship. 
+
+#### Box Plots
+```{r}
+plotSetup +
+  geom_boxplot(mapping = aes(x = support, y = avg_hatecrimes, fill = support)) +
+  labs(x = "", y = "Average Hate Crimes", title = "Voter Support")
+```
+This boxplot clearly identifies and further reinforces that Trump has less support nationwide. The median, Q1, and Q3 values are all lower for Trump. Now lets create a similar boxplot, except break it down by region...
+
+```{r}
+plotSetup +
+  geom_boxplot(mapping = aes(x = support, y = avg_hatecrimes, fill = support)) +
+  facet_grid(. ~ region) +
+  labs(x = "", y = "Average Hate Crimes", title = "Regional Voter Support")
+```
+This boxplot is interesting. Clinton actually had a higher median of support in the South than Trump. This was hidden in the histogram. Lets take a look at the scatterplots
+
+##### Scatterplot
+```{r}
+model <- lm(trump_share ~ avg_hatecrimes, data = data)
+bf <- coef(model)
+
+plotSetup +
+  geom_point(mapping = aes(x = trump_share, y = avg_hatecrimes, color = region)) +
+  geom_abline(slope = bf[[1]], intercept = bf[[2]]) +
+  labs(x = "Trump Voter Share", y = "Average Hate Crimes", title = "Trump Share vs Average Hate Crimes")
+```
+
+```{r}
+summary(model)
+```
+
+The slope is positive, which does indicate that there is a positive correlation between *trump_share* and *avg_hatecrimes*. The R-Squared indicates that only `r str_c(round(summary(model)$r.squared * 100, 2), "%", sep = "")` of the variation.
+
+We can also use the other variable *hate_crime_proportion* and plot it versus *trump_share*
+```{r}
+model <- lm(trump_share ~ hate_crime_proportion, data = data)
+bf <- coef(model)
+
+plotSetup +
+  geom_point(mapping = aes(x = trump_share, y = hate_crime_proportion, color = region)) +
+  geom_abline(slope = bf[[1]], intercept = bf[[2]]) +
+  labs(x = "Trump Voter Share", y = "Hate Crime Proportion", title = "Trump Share vs Hate Crime Proportion") +
+  lims(x = c(.2, .8))
+```
+```{r}
+summary(model)
+```
+The slope is positive, which does indicate that there is a positive correlation between *trump_share* and *hate_crime_proportion*. The R-Squared indicates that only `r str_c(round(summary(model)$r.squared * 100, 2), "%", sep = "")` of the variation.
+
+Both scatterplots show evidence of a positive correlation and both R-Squared values demonstrate that *trump_share* is not a great explanatory variable for hate crimes.
 
 
 ### Part 4 - Inference
