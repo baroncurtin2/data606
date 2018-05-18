@@ -251,7 +251,3 @@ Through significance testing, we were able to confirm that there was not enough 
 
 ### References
 Majumder, Maimuna. “Higher Rates Of Hate Crimes Are Tied To Income Inequality.” FiveThirtyEight, FiveThirtyEight, 21 Apr. 2017, fivethirtyeight.com/features/higher-rates-of-hate-crimes-are-tied-to-income-inequality/.
-
-### Appendix (optional)
-
-Remove this section if you don't have an appendix
