@@ -1,0 +1,169 @@
+---
+title: "DATA 606 Spring 2018 - Final Exam"
+author: "Baron Curtin"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    df_print: paged
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(collapse = TRUE)
+libs <- c("tidyverse", "magrittr", "kableExtra", "knitr", "DATA606")
+
+loadPkg <- function(x) {
+  if(!require(x, character.only = T)) install.packages(x, dependencies = T)
+  require(x, character.only = T)
+}
+
+lapply(libs, loadPkg)
+```
+
+# Part I
+
+Please put the answers for Part I next to the question number (2pts each):
+
+1.  b. daysDrive is the only quantitative and discrete variable.
+2.  a. mean = 3.3, median = 3.5. The left skew will mean the median is higher than the mean, but a median of 3.8 is too high.
+3.  d. Both studies (a) and (b) can be conducted in order to establish that the treatment does indeed cause improvement with regards to fever in Ebola patients. (a) describes an experiment while (b) describes an observational study. Both are capable of determining causation
+4.  c. there is an association between natural hair color and eye color. Large chi-square values indicate small p-values.
+5.  b. `r 37 - ((49.8 - 37) * 1.5)` and `r 49.8 + ((49.8 - 37) * 1.5)`
+6.  d. median and interquartile range; mean and standard deviation
+
+7a. Describe the two distributions (2pts).
+(a) The distribution is skewed right, uni-modal, and has a small spread.
+(b) The distribution is nearly normal, close to symmetric, uni-modal, and has a wide spread.
+
+7b. Explain why the means of these two distributions are similar but the standard deviations are not (2 pts).
+The means of these two distributions are similar because figure B is a sampling distribution of figure A (population). Whenever a sampling distribution is taken from a population, the distribution will center around the population. Figure A's standard deviation is based on the entire population. Figure B's standard deviation is based upon the samples taken. Since Figure B's standard deviation is based upon the sampling from the population, it will experience sampling error. Standard error would be used as the standard deviation. In addition, Figure A's standard deviation would exhibit variability of the observations, while figure B's standard deviation would illustrate variability of the sample means
+
+7c. What is the statistical principal that describes this phenomenon (2 pts)?
+Central Limit Theorem
+
+# Part II
+
+Consider the four datasets, each with two columns (x and y), provided below. 
+
+```{r}
+options(digits=2)
+data1 <- data_frame(x=c(10,8,13,9,11,14,6,4,12,7,5),
+					y=c(8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68))
+data2 <- data_frame(x=c(10,8,13,9,11,14,6,4,12,7,5),
+					y=c(9.14,8.14,8.74,8.77,9.26,8.1,6.13,3.1,9.13,7.26,4.74))
+data3 <- data_frame(x=c(10,8,13,9,11,14,6,4,12,7,5),
+					y=c(7.46,6.77,12.74,7.11,7.81,8.84,6.08,5.39,8.15,6.42,5.73))
+data4 <- data_frame(x=c(8,8,8,8,8,8,8,19,8,8,8),
+					y=c(6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.5,5.56,7.91,6.89))
+
+dfs <- list("data1" = data1, "data2" = data2, "data3" = data3, "data4" = data4)
+```
+
+For each column, calculate (to two decimal places):
+
+#### a. The mean (for x and y separately; 1 pt).
+
+```{r}
+dfs %>%
+  map(.f = function(df) {
+    map_dbl(.x = df, .f = function(col) {
+      round(mean(col), 2)
+    })
+  })
+```
+
+#### b. The median (for x and y separately; 1 pt).
+
+```{r}
+dfs %>%
+  map(.f = function(df) {
+    map_dbl(.x = df, .f = function(col) {
+      round(median(col), 2)
+    })
+  })
+```
+
+#### c. The standard deviation (for x and y separately; 1 pt).
+
+```{r}
+dfs %>%
+  map(.f = function(df) {
+    map_dbl(.x = df, .f = function(col) {
+      round(sd(col), 2)
+    })
+  })
+```
+
+#### For each x and y pair, calculate (also to two decimal places; 1 pt):
+
+#### d. The correlation (1 pt).
+
+```{r}
+dfs %>%
+  map(.f = function(df) {
+    round(cor(df$x, df$y), 2)
+  })
+```
+
+#### e. Linear regression equation (2 pts).
+
+```{r}
+lms <- dfs %>%
+  map(.f = function(df) {
+    lm(y ~ x, data = df)
+  })
+```
+  
+  * data1: $\hat{y} = `r coef(lms[[1]])[1]` * x + `r coef(lms[[1]])[2]`$
+  * data2: $\hat{y} = `r coef(lms[[2]])[1]` * x + `r coef(lms[[2]])[2]`$
+  * data3: $\hat{y} = `r coef(lms[[3]])[1]` * x + `r coef(lms[[3]])[2]`$
+  * data4: $\hat{y} = `r coef(lms[[4]])[1]` * x + `r coef(lms[[4]])[2]`$
+
+#### f. R-Squared (2 pts).
+
+```{r}
+lms %>%
+  map(.f = function(lm) {
+    round(summary(lm)$r.squared, 2)
+  })
+```
+
+
+#### For each pair, is it appropriate to estimate a linear regression model? Why or why not? Be specific as to why for each pair and include appropriate plots! (4 pts)
+```{r}
+dfs %>%
+  map2(.y = names(dfs), .f = function(df, name) {
+    
+    # model
+    model <- lm(y ~ x, data = df)
+    
+    # setup
+    par(mfrow = c(2, 2))
+    
+    # graphs
+    plot(y ~ x, data = df, main = str_c("Linearity Check", name, sep = " "))
+    abline(model)
+    
+    hist(model$residuals)
+    qqnorm(model$residuals)
+    qqline(model$residuals)
+    
+    plot(model$residuals ~ df$x)
+    abline(h = 0, lty = 3)
+  })
+```
+  * data1: It is not appropriate for data1 as the residuals are not normally distributed
+  * data2: It is not appropriate for data2 as the residuals are not normally distributed, nor does it exhibit a linear relationship
+  * data3: Despite the outlier, data3 meets the criteria for a linear relationship
+  * data4: It is not appropriate for data4 as it doesn't exhibit a linear relationship
+
+
+
+
+#### Explain why it is important to include appropriate visualizations when analyzing data. Include any visualization(s) you create. (2 pts)
+
+It is important to include *appropriate* visualizations when analyzing data because if you include visualizations that aren't the questions for analysis, then you won't reach to conclusions necessary to answer the questions. An example is creating a scatterplot to show how the data is distributed. A scatterplot is better served showing the relationship between two variables as opposed to the distribution. The plots above analyze the appropriateness of a linear model. Showing a pie chart or some other non-relevant visualization would not supply the answer needed to answer the question. 
